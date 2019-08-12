@@ -1,0 +1,25 @@
+---
+
+- name: handle case of CentOS
+  block:
+    - name: install IUS (inline with upstream) package repository
+      yum: name=https://centos7.iuscommunity.org/ius-release.rpm state=present
+    - name: install Python 3 packages
+      yum:
+        name:
+        - python{{ item|replace(".", "") }}u
+        - python{{ item|replace(".", "") }}u-devel
+        state: present
+      loop: "{{ python3_versions }}"
+  when: >
+    ansible_distribution == "CentOS"
+
+- name: install Python 3 packages (Fedora)
+  yum:
+    name:
+    - python{{ item|replace(".", "") }}
+    - python{{ item|replace(".", "") }}-devel
+    state: present
+  loop: "{{ python3_versions }}"
+  when: >
+    ansible_distribution == "Fedora"

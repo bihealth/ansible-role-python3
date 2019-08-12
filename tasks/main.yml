@@ -1,0 +1,23 @@
+---
+
+- name: perform installation
+  include_tasks: install/{{ ansible_os_family }}.yml
+
+- name: create /usr/local/get-pip
+  file:
+    path: /usr/local/get-pip
+    state: directory
+    recurse: true
+
+- name: download get-pip.py
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /usr/local/get-pip/get-pip.py
+  register: get_pip
+
+- name: install pip
+  command: >
+    python{{ item }} /usr/local/get-pip/get-pip.py
+  loop: "{{ python3_versions }}"
+  when: get_pip.changed
+  tags: [skip_ansible_lint]  # yes, run here not in handler!

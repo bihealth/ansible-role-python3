@@ -1,0 +1,45 @@
+---
+
+- name: installation for Ubuntu
+  block:
+    - name: add PPA for python3
+      apt_repository:
+        repo: ppa:deadsnakes/ppa
+        state: present
+    - name: install python3 packages
+      apt:
+        name:
+          - python{{ item }}
+          - python{{ item }}-dev
+        state: present
+      loop: "{{ python3_versions }}"
+  when: ansible_distribution == "Ubuntu"
+
+- name: debug ansible_distribution
+  debug:
+    var: ansible_distribution
+
+- name: debug ansible_distribution_version
+  debug:
+    var: ansible_distribution_version
+
+- name: debug item
+  debug:
+    var: item
+  loop: "{{ python3_versions }}"
+
+- name: install python3-distutils if required
+  apt:
+    name:
+      - python3-distutils
+    state: present
+  when: >
+    item|string == "3.6"
+    and ansible_distribution == "Ubuntu"
+    and ansible_distribution_version == "18.04"
+  loop: "{{ python3_versions }}"
+
+- name: compile for Debian
+  include_tasks: build_{{ ansible_distribution }}.yml
+  loop: "{{ python3_versions }}"
+  when: ansible_distribution == "Debian"

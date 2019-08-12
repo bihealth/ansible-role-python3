@@ -1,0 +1,59 @@
+---
+
+- name: install build dependencies
+  apt:
+    name:
+      - wget
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libncurses5-dev
+      - libncursesw5-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - libdb5.3-dev
+      - libbz2-dev
+      - libexpat1-dev
+      - liblzma-dev
+      - libffi-dev
+      - uuid-dev
+
+- name: get latest version
+  shell: >
+    set -eo pipefail;
+    wget -O - https://www.python.org/ftp/python/ 2>/dev/null | \
+    grep 'href="3\.' | \
+    perl -pe 's/^.*?>//g' | \
+    perl -pe 's/\/.*//g' | \
+    grep '^{{ item }}' | \
+    tail -n 1
+  args:
+    executable: /bin/bash
+  changed_when: false
+  register: latest_version
+  tags: [skip_ansible_lint]  # yes, I want wget here
+
+- name: create build directory
+  file:
+    path: /tmp/python-build
+    state: directory
+
+- name: download source tarball
+  unarchive:
+    src: https://www.python.org/ftp/python/{{ latest_version.stdout }}/Python-{{ latest_version.stdout }}.tar.xz
+    dest: /tmp/python-build
+    remote_src: true
+    creates: /tmp/python-build/Python-{{ latest_version.stdout }}
+
+- name: configure & build
+  shell: |
+    set -ex
+    ./configure --prefix=/usr/local {{ python3_configure_extra_flags }}
+    make -j 8
+    make install
+    cd /tmp
+    rm -rf /tmp/python-build/Python-{{ latest_version.stdout }}/*
+  args:
+    executable: /bin/bash
+    creates: /usr/local/bin/python{{ item }}
+    chdir: /tmp/python-build/Python-{{ latest_version.stdout }}

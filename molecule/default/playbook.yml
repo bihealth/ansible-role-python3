@@ -1,0 +1,11 @@
+---
+
+- name: Converge
+  hosts: all
+  vars:
+    python3_versions:
+      - "3.5"
+      - "3.6"
+      # - "3.7"  # not available for centos7 IUS yet
+  roles:
+    - role: ansible-role-python3
