@@ -1,7 +1,7 @@
 ---
 
 galaxy_info:
-  role_name: bihealth.ansible-role-python3
+  role_name: python3
   author: Manuel Holtgrewe
   description: Cross-platform Python 3 setup.
   company: Core Unit Bioinformatics (CUBI), Berlin Institute of Health (BIH)
