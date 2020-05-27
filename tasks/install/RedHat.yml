@@ -3,7 +3,7 @@
 - name: handle case of CentOS
   block:
     - name: install IUS (inline with upstream) package repository
-      yum: name=https://centos7.iuscommunity.org/ius-release.rpm state=present
+      yum: name=https://repo.ius.io/ius-release-el7.rpm state=present
     - name: install Python 3 packages
       yum:
         name:
